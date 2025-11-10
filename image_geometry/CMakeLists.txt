@@ -2,15 +2,65 @@ cmake_minimum_required(VERSION 3.0.2)
 project(image_geometry)
 
 find_package(catkin REQUIRED sensor_msgs)
-find_package(OpenCV REQUIRED)
 
-catkin_package(CATKIN_DEPENDS sensor_msgs
-               DEPENDS OpenCV
-               INCLUDE_DIRS include ${OpenCV_INCLUDE_DIRS}
-               LIBRARIES ${PROJECT_NAME}
+####################################################################################################
+# find_package(OpenCV REQUIRED)
+####################################################################################################
+
+####################################################################################################
+set(_opencv_version 4.10.0)
+set(OpenCV_DIR "/opt/opencv-${_opencv_version}/lib/cmake/opencv4")
+# set(OpenCV_DIR "/usr/lib/aarch64-linux-gnu/cmake/opencv4")
+find_package(OpenCV ${_opencv_version} EXACT REQUIRED CONFIG 
+    PATHS ${OpenCV_DIR}
+    NO_DEFAULT_PATH
+    NO_CMAKE_FIND_ROOT_PATH
 )
+message(STATUS "${PROJECT_NAME} OpenCV_VERSION           : ${OpenCV_VERSION}")
+message(STATUS "${PROJECT_NAME} OpenCV_INCLUDE_DIRS      : ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "${PROJECT_NAME} OpenCV_LIBRARIES         : ${OpenCV_LIBRARIES}")
+message(STATUS "${PROJECT_NAME} OpenCV_LIBRARIES details : ")
+foreach(component ${OpenCV_LIBRARIES})
+    if(TARGET ${component})
+        message(STATUS " |  OpenCV target : ${component}")
 
-catkin_python_setup()
+        get_target_property(lib_type ${component} TYPE)
+        message(STATUS " |   |                           TYPE : ${lib_type}")
+
+        get_target_property(lib_loc ${component} IMPORTED_LOCATION)
+        message(STATUS " |   |              IMPORTED_LOCATION : ${lib_loc}")
+
+        get_target_property(lib_loc_debug ${component} IMPORTED_LOCATION_DEBUG)
+        message(STATUS " |   |        IMPORTED_LOCATION_DEBUG : ${lib_loc_debug}")
+
+        get_target_property(lib_loc_release ${component} IMPORTED_LOCATION_RELEASE)
+        message(STATUS " |   |      IMPORTED_LOCATION_RELEASE : ${lib_loc_release}")
+
+        get_target_property(include_dirs ${component} INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS " |   |  INTERFACE_INCLUDE_DIRECTORIES : ${include_dirs}")
+    else()
+        message(STATUS " |  OpenCV library : ${component}")
+    endif()
+endforeach()
+####################################################################################################
+
+####################################################################################################
+# catkin_package(
+#         CATKIN_DEPENDS sensor_msgs
+#         DEPENDS OpenCV
+#         INCLUDE_DIRS include ${OpenCV_INCLUDE_DIRS}
+#         LIBRARIES ${PROJECT_NAME}
+# )
+####################################################################################################
+
+####################################################################################################
+catkin_package(
+    INCLUDE_DIRS include ${OpenCV_INCLUDE_DIRS}
+    LIBRARIES ${PROJECT_NAME} ${OpenCV_LIBRARIES}
+    CATKIN_DEPENDS sensor_msgs
+    DEPENDS OpenCV
+)
+####################################################################################################
 
 include_directories(include)
 include_directories(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})

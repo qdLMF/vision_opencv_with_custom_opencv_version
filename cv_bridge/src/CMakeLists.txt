@@ -1,6 +1,20 @@
 # add library
 include_directories(./)
 add_library(${PROJECT_NAME} cv_bridge.cpp rgb_colors.cpp)
+####################################################################################################
+# RPATH配置
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# 设置RPATH - 包含自定义OpenCV和ROS库路径
+set(CMAKE_INSTALL_RPATH "/opt/opencv-${_opencv_version}/lib:/opt/ros/noetic/lib")
+# 为${PROJECT_NAME}目标设置RPATH属性
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    INSTALL_RPATH "/opt/opencv-${_opencv_version}/lib:/opt/ros/noetic/lib"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    SKIP_BUILD_RPATH FALSE
+)
+####################################################################################################
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 
